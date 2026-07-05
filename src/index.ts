@@ -136,42 +136,69 @@ class ArbitrageService {
     console.log('Service stopped');
   }
 
-  private async loadActiveMarkets(): Promise<void> {
-    let responseData: any[] | null = null;
+  private async fetchAllMarkets(): Promise<any[]> {
+    const allMarkets: any[] = [];
+    let cursor: string | null = null;
+
     try {
       const token = await this.jwtManager.getToken();
-      const { data } = await axios.get(`${AppConfig.apiBaseUrl}/v1/markets`, {
-        headers: { Authorization: `Bearer ${token}`, 'x-api-key': AppConfig.apiKey },
-      });
 
-      responseData = data.data;
+      while (true) {
+        const params: any = { first: '500' };
+        if (cursor) params.after = cursor;
 
-      if (data.success && data.data) {
-        console.log(`Market status example: ${data.data.slice(0, 5).map((m: any) => JSON.stringify({ id: m.id, status: m.status })).join(', ')}`);
-        for (const market of data.data) {
-          if (market.status === 'REGISTERED' || market.status === 'PRICE_PROPOSED' || market.status === 'UNPAUSED') {
-            this.activeMarkets.set(market.id, {
-              id: market.id,
-              title: market.title || market.question,
-              question: market.question,
-              decimalPrecision: market.decimalPrecision || AppConfig.decimalPrecisionDefault,
-              isNegRisk: market.isNegRisk || false,
-              isYieldBearing: market.isYieldBearing || false,
-              feeRateBps: market.feeRateBps || 0,
-              outcomes: (market.outcomes || []).map((o: any) => ({
-                name: o.name,
-                onChainId: o.onChainId,
-                indexSet: o.indexSet,
-              })),
-            });
-          }
-        }
+        const { data } = await axios.get(`${AppConfig.apiBaseUrl}/v1/markets`, {
+          headers: { Authorization: `Bearer ${token}`, 'x-api-key': AppConfig.apiKey },
+          params,
+          timeout: 15000,
+        });
+
+        if (!data.success || !data.data || data.data.length === 0) break;
+
+        allMarkets.push(...data.data);
+        cursor = data.cursor || null;
+
+        if (!cursor) break;
       }
     } catch (error) {
-      console.error('Failed to load active markets:', error);
+      console.error('Failed to fetch markets:', error);
     }
 
-    console.log(`Active markets loaded: ${this.activeMarkets.size}, total returned by API: ${responseData?.length || 0}`);
+    return allMarkets;
+  }
+
+  private async loadActiveMarkets(): Promise<void> {
+    const allMarkets = await this.fetchAllMarkets();
+
+    console.log(`All markets fetched: ${allMarkets.length}`);
+    if (allMarkets.length > 0) {
+      const statusCounts: Record<string, number> = {};
+      for (const m of allMarkets) {
+        statusCounts[m.status] = (statusCounts[m.status] || 0) + 1;
+      }
+      console.log(`Status distribution: ${JSON.stringify(statusCounts)}`);
+    }
+
+    for (const market of allMarkets) {
+      if (market.status === 'REGISTERED' || market.status === 'PRICE_PROPOSED' || market.status === 'UNPAUSED') {
+        this.activeMarkets.set(market.id, {
+          id: market.id,
+          title: market.title || market.question,
+          question: market.question,
+          decimalPrecision: market.decimalPrecision || AppConfig.decimalPrecisionDefault,
+          isNegRisk: market.isNegRisk || false,
+          isYieldBearing: market.isYieldBearing || false,
+          feeRateBps: market.feeRateBps || 0,
+          outcomes: (market.outcomes || []).map((o: any) => ({
+            name: o.name,
+            onChainId: o.onChainId,
+            indexSet: o.indexSet,
+          })),
+        });
+      }
+    }
+
+    console.log(`Active markets loaded: ${this.activeMarkets.size}`);
   }
 
   private async internalScan(): Promise<void> {
@@ -263,19 +290,14 @@ class ArbitrageService {
     this.crossScanCount++;
 
     try {
-      const token = await this.jwtManager.getToken();
-      const { data: pfResp } = await axios.get(`${AppConfig.apiBaseUrl}/v1/markets`, {
-        headers: { Authorization: `Bearer ${token}`, 'x-api-key': AppConfig.apiKey },
-      });
-
-      if (!pfResp.success || !pfResp.data) return;
+      const allPfMarkets = await this.fetchAllMarkets();
+      const activePfMarkets = allPfMarkets.filter((m: any) =>
+        m.status === 'REGISTERED' || m.status === 'PRICE_PROPOSED' || m.status === 'UNPAUSED'
+      );
 
       const [pmMarkets, pfMarkets] = await Promise.all([
         this.pm.getActiveMarkets(),
-        Promise.resolve(
-          (pfResp.data || []).filter((m: any) =>
-            m.status === 'REGISTERED' || m.status === 'PRICE_PROPOSED' || m.status === 'UNPAUSED'
-          ).map((m: any) => ({
+        Promise.resolve(activePfMarkets.map((m: any) => ({
             platform: 'PREDICTFUN' as const,
             id: m.id.toString(),
             slug: m.slug || '',
