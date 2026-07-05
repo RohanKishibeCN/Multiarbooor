@@ -139,11 +139,14 @@ class ArbitrageService {
   private async fetchAllMarkets(): Promise<any[]> {
     const allMarkets: any[] = [];
     let cursor: string | null = null;
+    let page = 0;
+    const MAX_PAGES = 10;
 
     try {
       const token = await this.jwtManager.getToken();
 
-      while (true) {
+      while (page < MAX_PAGES) {
+        page++;
         const params: any = { first: '500' };
         if (cursor) params.after = cursor;
 
@@ -153,12 +156,23 @@ class ArbitrageService {
           timeout: 15000,
         });
 
-        if (!data.success || !data.data || data.data.length === 0) break;
+        if (!data.success || !data.data) {
+          console.log(`fetchAllMarkets page ${page}: success=false or no data, stopping`);
+          break;
+        }
 
         allMarkets.push(...data.data);
-        cursor = data.cursor || null;
+        console.log(`fetchAllMarkets page ${page}: got ${data.data.length} markets, cursor=${data.cursor ? 'set' : 'null'}`);
 
+        if (data.data.length === 0) break;
+
+        const prevCursor: string | null = cursor;
+        cursor = data.cursor || null;
         if (!cursor) break;
+        if (cursor === prevCursor) {
+          console.log(`fetchAllMarkets: cursor unchanged on page ${page}, stopping`);
+          break;
+        }
       }
     } catch (error) {
       console.error('Failed to fetch markets:', error);
