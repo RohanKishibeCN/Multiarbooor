@@ -1,0 +1,189 @@
+# Predict API (Beta)
+
+## Docs
+- [Developer Documentation - Predict API](https://dev.predict.fun/faqs-684248m0.md): 
+- [ Deployed Contracts](https://dev.predict.fun/-deployed-contracts-1860295m0.md): 
+- Guides [Understanding the Orderbook](https://dev.predict.fun/understanding-the-orderbook-685654m0.md): 
+- Guides [[TS] How to authenticate your API requests](https://dev.predict.fun/ts-how-to-authenticate-your-api-requests-663127m0.md): 
+- Guides [[PY] How to authenticate your API requests](https://dev.predict.fun/py-how-to-authenticate-your-api-requests-1868364m0.md): 
+- Guides [How to create or cancel orders](https://dev.predict.fun/how-to-create-or-cancel-orders-679306m0.md): 
+- WebSocket [General Information](https://dev.predict.fun/general-information-1915499m0.md): 
+- WebSocket [Request Format](https://dev.predict.fun/request-format-1915501m0.md): 
+- WebSocket [Response Format](https://dev.predict.fun/response-format-1915502m0.md): 
+- WebSocket [Subscription Topics](https://dev.predict.fun/subscription-topics-1915507m0.md): 
+- WebSocket [Heartbeats](https://dev.predict.fun/heartbeats-1915508m0.md): 
+- WebSocket [Client Example](https://dev.predict.fun/client-example-1915523m0.md): 
+
+## API Docs
+- Authorization [Get auth message](https://dev.predict.fun/get-auth-message-25326899e0.md): Get the message to sign to generate a JWT token.
+- Authorization [Get JWT with valid signature](https://dev.predict.fun/get-jwt-with-valid-signature-25326900e0.md): Provide a signature and get back a valid JWT that allows order actions
+- Categories [Get categories](https://dev.predict.fun/get-categories-25326910e0.md): :::info
+- Categories [Get category by slug](https://dev.predict.fun/get-category-by-slug-25326911e0.md): Get category information and its markets by slug
+- Categories [Get all tags](https://dev.predict.fun/get-all-tags-27399809e0.md): Get all tags that have at least one visible category
+- Markets [Get markets](https://dev.predict.fun/get-markets-25326905e0.md): Get information about markets
+- Markets [Get market by ID](https://dev.predict.fun/get-market-by-id-25552989e0.md): Get detailed information about a specific market by its ID
+- Markets [Get market statistics](https://dev.predict.fun/get-market-statistics-25326906e0.md): Get statistics about a specific market
+- Markets [Get market last sale information](https://dev.predict.fun/get-market-last-sale-information-25326907e0.md): Get the last sale information for a specific market
+- Markets [Get the orderbook for a market](https://dev.predict.fun/get-the-orderbook-for-a-market-25326908e0.md): :::info[]
+- Markets [Get market timeseries](https://dev.predict.fun/get-market-timeseries-32534695e0.md): 
+- Markets [Get latest market timeseries value](https://dev.predict.fun/get-latest-market-timeseries-value-32534696e0.md): 
+- Orders [Get order by hash](https://dev.predict.fun/get-order-by-hash-25326901e0.md): Get the order information for one of your own orders by its hash
+- Orders [Get orders](https://dev.predict.fun/get-orders-25326902e0.md): Get a list of your own orders
+- Orders [Get order match events](https://dev.predict.fun/get-order-match-events-25663812e0.md): Get a paginated list of order match events with optional filtering by category, market, minimum value and signer. The results are sorted by `executedAt DESC`.
+- Orders [Remove orders from the orderbook](https://dev.predict.fun/remove-orders-from-the-orderbook-25326904e0.md): Remove orders from the orderbook for the JWT signer. 
+- Orders [Create an order](https://dev.predict.fun/create-an-order-32534694e0.md): Create a LIMIT or MARKET order for the authenticated user.
+- Orders [Remove orders by hash](https://dev.predict.fun/remove-orders-by-hash-38139973e0.md): Remove orders from the orderbook by their hash for the authenticated signer (max 100).
+- Accounts [Get connected account](https://dev.predict.fun/get-connected-account-25326917e0.md): Get information for the connected user account
+- Accounts [Get account activity](https://dev.predict.fun/get-account-activity-32534697e0.md): Get a paginated list of trading activity including orders, matches,
+- Accounts [Set a referral](https://dev.predict.fun/set-a-referral-25326918e0.md): Set a referral code if not already set
+- Positions [Get positions](https://dev.predict.fun/get-positions-32675933e0.md): Get data about your positions.
+- Positions [Get positions by address](https://dev.predict.fun/get-positions-by-address-32675934e0.md): Get positions for a specific wallet address.
+- Search [Search categories and markets](https://dev.predict.fun/search-categories-and-markets-27399810e0.md): Full-text search across categories and markets. Returns separate arrays for each type, sorted by relevance.
+- OAuth [Finalize a OAuth connection](https://dev.predict.fun/finalize-a-oauth-connection-25326912e0.md): [This endpoint is not available for general use]
+- OAuth [Get the orders for a OAuth connection](https://dev.predict.fun/get-the-orders-for-a-oauth-connection-25326913e0.md): [This endpoint is not available for general use]
+- OAuth [Create an order for a OAuth connection](https://dev.predict.fun/create-an-order-for-a-oauth-connection-25326914e0.md): [This endpoint is not available for general use]
+- OAuth [Cancel the orders for a OAuth connection](https://dev.predict.fun/cancel-the-orders-for-a-oauth-connection-25326915e0.md): [This endpoint is not available for general use]
+- OAuth [Get the positions for a OAuth connection](https://dev.predict.fun/get-the-positions-for-a-oauth-connection-25326916e0.md): [This endpoint is not available for general use]
+
+## Schemas
+- [AccountData](https://dev.predict.fun/accountdata-14037447d0.md): 
+- [AccountResponse](https://dev.predict.fun/accountresponse-14037448d0.md): 
+- [ActivityEvent](https://dev.predict.fun/activityevent-14037449d0.md): 
+- [ActivityEventName](https://dev.predict.fun/activityeventname-14037450d0.md): 
+- [ActivityOrderData](https://dev.predict.fun/activityorderdata-14037451d0.md): 
+- [ActivityResponse](https://dev.predict.fun/activityresponse-14037452d0.md): 
+- [AuthMessageData](https://dev.predict.fun/authmessagedata-14037453d0.md): 
+- [AuthMessageResponse](https://dev.predict.fun/authmessageresponse-14037454d0.md): 
+- [AuthTokenData](https://dev.predict.fun/authtokendata-14037455d0.md): 
+- [AuthTokenResponse](https://dev.predict.fun/authtokenresponse-14037456d0.md): 
+- [BulletinBoardUpdate](https://dev.predict.fun/bulletinboardupdate-15856599d0.md): 
+- [BulletinBoardUpdatesResponse](https://dev.predict.fun/bulletinboardupdatesresponse-15856600d0.md): 
+- [CategoriesResponse](https://dev.predict.fun/categoriesresponse-14037457d0.md): 
+- [CategoryResponse](https://dev.predict.fun/categoryresponse-14037458d0.md): 
+- [CategorySort](https://dev.predict.fun/categorysort-14037459d0.md): 
+- [CategoryStatsData](https://dev.predict.fun/categorystatsdata-14037460d0.md): 
+- [CategoryStatsResponse](https://dev.predict.fun/categorystatsresponse-14037461d0.md): 
+- [CategoryStatus](https://dev.predict.fun/categorystatus-14037462d0.md): 
+- [CategoryStatusFilter](https://dev.predict.fun/categorystatusfilter-14037463d0.md): 
+- [CategoryTranslationData](https://dev.predict.fun/categorytranslationdata-15856601d0.md): 
+- [CategoryTranslationFields](https://dev.predict.fun/categorytranslationfields-15856602d0.md): 
+- [CategoryTranslationsResponse](https://dev.predict.fun/categorytranslationsresponse-15856603d0.md): 
+- [CategoryWithStats](https://dev.predict.fun/categorywithstats-15856593d0.md): 
+- [ContractOrder](https://dev.predict.fun/contractorder-14037464d0.md): 
+- [CreateOrderData](https://dev.predict.fun/createorderdata-14037465d0.md): 
+- [CreateOrderRequest](https://dev.predict.fun/createorderrequest-14037466d0.md): 
+- [CreateOrderResponse](https://dev.predict.fun/createorderresponse-14037467d0.md): 
+- [CreateOrderResponseData](https://dev.predict.fun/createorderresponsedata-14037468d0.md): 
+- [CryptoUpDownVariantData](https://dev.predict.fun/cryptoupdownvariantdata-14037469d0.md): 
+- [ErrorCode](https://dev.predict.fun/errorcode-14037470d0.md): 
+- [ErrorResponse](https://dev.predict.fun/errorresponse-14037471d0.md): 
+- [Fee](https://dev.predict.fun/fee-14037472d0.md): 
+- [FeeEventData](https://dev.predict.fun/feeeventdata-15856604d0.md): 
+- [FeeEventsResponse](https://dev.predict.fun/feeeventsresponse-15856605d0.md): 
+- [FeeType](https://dev.predict.fun/feetype-14037473d0.md): 
+- [LastOrderSettled](https://dev.predict.fun/lastordersettled-14037474d0.md): 
+- [LastSaleData](https://dev.predict.fun/lastsaledata-14037475d0.md): 
+- [LastSaleResponse](https://dev.predict.fun/lastsaleresponse-14037476d0.md): 
+- [Market](https://dev.predict.fun/market-14037477d0.md): 
+- [MarketResponse](https://dev.predict.fun/marketresponse-14037478d0.md): 
+- [MarketRewards](https://dev.predict.fun/marketrewards-14672463d0.md): 
+- [MarketSort](https://dev.predict.fun/marketsort-14037479d0.md): 
+- [MarketStatsData](https://dev.predict.fun/marketstatsdata-14037480d0.md): 
+- [MarketStatsResponse](https://dev.predict.fun/marketstatsresponse-14037481d0.md): 
+- [OAuthCancelOrdersData](https://dev.predict.fun/oauthcancelordersdata-14037490d0.md): 
+- [MarketStatus](https://dev.predict.fun/marketstatus-14037482d0.md): 
+- [OAuthCancelOrdersRequest](https://dev.predict.fun/oauthcancelordersrequest-14037491d0.md): 
+- [MarketStatusFilter](https://dev.predict.fun/marketstatusfilter-14037483d0.md): 
+- [OAuthCancelOrdersResponse](https://dev.predict.fun/oauthcancelordersresponse-14037492d0.md): 
+- [OAuthCreateOrderData](https://dev.predict.fun/oauthcreateorderdata-14037493d0.md): 
+- [MarketTimeseries](https://dev.predict.fun/markettimeseries-15856595d0.md): 
+- [OAuthCreateOrderRequest](https://dev.predict.fun/oauthcreateorderrequest-14037494d0.md): 
+- [MarketTimeseriesLatest](https://dev.predict.fun/markettimeserieslatest-15856596d0.md): 
+- [MarketTradingStatus](https://dev.predict.fun/markettradingstatus-14037484d0.md): 
+- [OAuthCreateOrderResponse](https://dev.predict.fun/oauthcreateorderresponse-14037495d0.md): 
+- [OAuthFinalizeData](https://dev.predict.fun/oauthfinalizedata-14037496d0.md): 
+- [MarketTranslationData](https://dev.predict.fun/markettranslationdata-15856606d0.md): 
+- [OAuthFinalizeRequest](https://dev.predict.fun/oauthfinalizerequest-14037497d0.md): 
+- [MarketType](https://dev.predict.fun/markettype-15856047d0.md): 
+- [MarketVariant](https://dev.predict.fun/marketvariant-14037485d0.md): 
+- [OAuthFinalizeResponse](https://dev.predict.fun/oauthfinalizeresponse-14037498d0.md): 
+- [OAuthOrdersData](https://dev.predict.fun/oauthordersdata-14037499d0.md): 
+- [MarketWithStats](https://dev.predict.fun/marketwithstats-15856594d0.md): 
+- [MarketsResponse](https://dev.predict.fun/marketsresponse-14037486d0.md): 
+- [OAuthOrdersRequest](https://dev.predict.fun/oauthordersrequest-14037500d0.md): 
+- [MatchData](https://dev.predict.fun/matchdata-14037487d0.md): 
+- [OAuthOrdersResponse](https://dev.predict.fun/oauthordersresponse-14037501d0.md): 
+- [MatchesResponse](https://dev.predict.fun/matchesresponse-14037488d0.md): 
+- [OAuthPositionsData](https://dev.predict.fun/oauthpositionsdata-14037502d0.md): 
+- [Metric](https://dev.predict.fun/metric-14037489d0.md): 
+- [OAuthPositionsRequest](https://dev.predict.fun/oauthpositionsrequest-14037503d0.md): 
+- [OAuthPositionsResponse](https://dev.predict.fun/oauthpositionsresponse-14037504d0.md): 
+- [OrderData](https://dev.predict.fun/orderdata-14037505d0.md): 
+- [OrderFillData](https://dev.predict.fun/orderfilldata-14037506d0.md): 
+- [OrderResponse](https://dev.predict.fun/orderresponse-14037507d0.md): 
+- [OrderStatus](https://dev.predict.fun/orderstatus-14037508d0.md): 
+- [OrderStatusFilter](https://dev.predict.fun/orderstatusfilter-14037509d0.md): 
+- [OrderStrategy](https://dev.predict.fun/orderstrategy-14037510d0.md): 
+- [OrderbookData](https://dev.predict.fun/orderbookdata-14037511d0.md): 
+- [OrderbookResponse](https://dev.predict.fun/orderbookresponse-14037512d0.md): 
+- [OrderbooksResponse](https://dev.predict.fun/orderbooksresponse-15856607d0.md): 
+- [OrdersResponse](https://dev.predict.fun/ordersresponse-14037513d0.md): 
+- [Outcome](https://dev.predict.fun/outcome-14037514d0.md): 
+- [OutcomeSide](https://dev.predict.fun/outcomeside-14037515d0.md): 
+- [OutcomeStatus](https://dev.predict.fun/outcomestatus-14037516d0.md): 
+- [OutcomeTranslation](https://dev.predict.fun/outcometranslation-15856608d0.md): 
+- [OutcomeVariantData](https://dev.predict.fun/outcomevariantdata-15856609d0.md): 
+- [OutcomeVariantData_SportsTeamOutcomeData](https://dev.predict.fun/outcomevariantdata-sportsteamoutcomedata-15856610d0.md): 
+- [PendingYieldData](https://dev.predict.fun/pendingyielddata-15856611d0.md): 
+- [PendingYieldResponse](https://dev.predict.fun/pendingyieldresponse-15856612d0.md): 
+- [PointsInfo](https://dev.predict.fun/pointsinfo-14037517d0.md): 
+- [PositionData](https://dev.predict.fun/positiondata-14037518d0.md): 
+- [PositionSort](https://dev.predict.fun/positionsort-14037519d0.md): 
+- [PositionsResponse](https://dev.predict.fun/positionsresponse-14037520d0.md): 
+- [PostAuthRequest](https://dev.predict.fun/postauthrequest-14037521d0.md): 
+- [RemoveOrdersData](https://dev.predict.fun/removeordersdata-14037526d0.md): 
+- [PriceFeedProvider](https://dev.predict.fun/pricefeedprovider-14037522d0.md): 
+- [RemoveOrdersRequest](https://dev.predict.fun/removeordersrequest-14037527d0.md): 
+- [RemoveOrdersResponse](https://dev.predict.fun/removeordersresponse-14037528d0.md): 
+- [PriceLevel](https://dev.predict.fun/pricelevel-15856613d0.md): 
+- [QuoteType](https://dev.predict.fun/quotetype-14037523d0.md): 
+- [ReferralInfo](https://dev.predict.fun/referralinfo-14037524d0.md): 
+- [ReferralStatus](https://dev.predict.fun/referralstatus-14037525d0.md): 
+- [RemoveOrdersByHashData](https://dev.predict.fun/removeordersbyhashdata-15856614d0.md): 
+- [RemoveOrdersByHashRequest](https://dev.predict.fun/removeordersbyhashrequest-15856615d0.md): 
+- [ReservedBalancePolicy](https://dev.predict.fun/reservedbalancepolicy-14037529d0.md): 
+- [Resolution](https://dev.predict.fun/resolution-14037530d0.md): 
+- [ResolutionProvider](https://dev.predict.fun/resolutionprovider-14037531d0.md): 
+- [RewardPeriod](https://dev.predict.fun/rewardperiod-14672464d0.md): 
+- [SearchData](https://dev.predict.fun/searchdata-14037532d0.md): 
+- [SearchResponse](https://dev.predict.fun/searchresponse-14037533d0.md): 
+- [SelectTeamsRequest](https://dev.predict.fun/selectteamsrequest-15856616d0.md): 
+- [SelfTradePreventionStrategy](https://dev.predict.fun/selftradepreventionstrategy-14037534d0.md): 
+- [SetReferralData](https://dev.predict.fun/setreferraldata-14037535d0.md): 
+- [SetReferralRequest](https://dev.predict.fun/setreferralrequest-14037536d0.md): 
+- [SetReferralResponse](https://dev.predict.fun/setreferralresponse-14037537d0.md): 
+- [SportsDataProvider](https://dev.predict.fun/sportsdataprovider-15856617d0.md): 
+- [SportsEventTeam](https://dev.predict.fun/sportseventteam-15856618d0.md): 
+- [SportsFifaFriendliesVariantData](https://dev.predict.fun/sportsfifafriendliesvariantdata-15856619d0.md): 
+- [SportsFifaWorldCupVariantData](https://dev.predict.fun/sportsfifaworldcupvariantdata-15856620d0.md): 
+- [SportsNbaVariantData](https://dev.predict.fun/sportsnbavariantdata-15856621d0.md): 
+- [SportsPropsMarketData](https://dev.predict.fun/sportspropsmarketdata-15856622d0.md): 
+- [SportsTeamOutcomeData](https://dev.predict.fun/sportsteamoutcomedata-15856623d0.md): 
+- [Tag](https://dev.predict.fun/tag-14037538d0.md): 
+- [TagsResponse](https://dev.predict.fun/tagsresponse-14037539d0.md): 
+- [Team](https://dev.predict.fun/team-15856624d0.md): 
+- [TeamSide](https://dev.predict.fun/teamside-15856625d0.md): 
+- [TimeseriesData](https://dev.predict.fun/timeseriesdata-14037540d0.md): 
+- [TimeseriesLatestBatchResponse](https://dev.predict.fun/timeserieslatestbatchresponse-15856626d0.md): 
+- [TimeseriesLatestData](https://dev.predict.fun/timeserieslatestdata-14037541d0.md): 
+- [TimeseriesLatestResponse](https://dev.predict.fun/timeserieslatestresponse-14037542d0.md): 
+- [TimeseriesPoint](https://dev.predict.fun/timeseriespoint-14037543d0.md): 
+- [TimeseriesResponse](https://dev.predict.fun/timeseriesresponse-14037544d0.md): 
+- [TweetCountVariantData](https://dev.predict.fun/tweetcountvariantdata-14037545d0.md): 
+- [VariantData](https://dev.predict.fun/variantdata-14037546d0.md): 
+- [VariantData_CryptoUpDownVariantData](https://dev.predict.fun/variantdata-cryptoupdownvariantdata-14037547d0.md): 
+- [VariantData_SportsFifaFriendliesVariantData](https://dev.predict.fun/variantdata-sportsfifafriendliesvariantdata-15856627d0.md): 
+- [VariantData_SportsFifaWorldCupVariantData](https://dev.predict.fun/variantdata-sportsfifaworldcupvariantdata-15856628d0.md): 
+- [VariantData_SportsNbaVariantData](https://dev.predict.fun/variantdata-sportsnbavariantdata-15856629d0.md): 
+- [VariantData_SportsPropsMarketData](https://dev.predict.fun/variantdata-sportspropsmarketdata-15856630d0.md): 
+- [VariantData_TweetCountVariantData](https://dev.predict.fun/variantdata-tweetcountvariantdata-14037548d0.md): 
