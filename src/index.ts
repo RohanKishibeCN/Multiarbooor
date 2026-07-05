@@ -121,6 +121,8 @@ class ArbitrageService {
 
     this.healthCheckInterval = setInterval(() => this.logHealth(), 60000);
 
+    setInterval(() => this.loadActiveMarkets(), 30 * 60 * 1000);
+
     console.log('Service started successfully');
 
     if (AppConfig.enableInternalArb) this.internalScan();
@@ -140,42 +142,41 @@ class ArbitrageService {
     const allMarkets: any[] = [];
     let cursor: string | null = null;
     let page = 0;
-    const MAX_PAGES = 10;
+    const MAX_PAGES = 50;
 
     try {
       const token = await this.jwtManager.getToken();
 
       while (page < MAX_PAGES) {
         page++;
-        const params: any = { first: '500' };
+        const params: any = { first: '100', status: 'OPEN' };
         if (cursor) params.after = cursor;
 
-        const { data } = await axios.get(`${AppConfig.apiBaseUrl}/v1/markets`, {
+        const { data } = await axios.get(`${AppConfig.apiBaseUrl}/v1/categories`, {
           headers: { Authorization: `Bearer ${token}`, 'x-api-key': AppConfig.apiKey },
           params,
           timeout: 15000,
         });
 
         if (!data.success || !data.data) {
-          console.log(`fetchAllMarkets page ${page}: success=false or no data, stopping`);
+          console.log(`fetchCategories page ${page}: success=false or no data, stopping`);
           break;
         }
 
-        allMarkets.push(...data.data);
-        console.log(`fetchAllMarkets page ${page}: got ${data.data.length} markets, cursor=${data.cursor ? 'set' : 'null'}`);
+        for (const category of data.data) {
+          if (category.markets && Array.isArray(category.markets)) {
+            allMarkets.push(...category.markets);
+          }
+        }
+        console.log(`fetchCategories page ${page}: got ${data.data.length} categories, ${allMarkets.length} markets total, cursor=${data.cursor ? 'set' : 'null'}`);
 
         if (data.data.length === 0) break;
 
-        const prevCursor: string | null = cursor;
         cursor = data.cursor || null;
         if (!cursor) break;
-        if (cursor === prevCursor) {
-          console.log(`fetchAllMarkets: cursor unchanged on page ${page}, stopping`);
-          break;
-        }
       }
     } catch (error) {
-      console.error('Failed to fetch markets:', error);
+      console.error('Failed to fetch categories:', error);
     }
 
     return allMarkets;
@@ -183,6 +184,9 @@ class ArbitrageService {
 
   private async loadActiveMarkets(): Promise<void> {
     const allMarkets = await this.fetchAllMarkets();
+    const beforeCount = this.activeMarkets.size;
+
+    this.activeMarkets.clear();
 
     console.log(`All markets fetched: ${allMarkets.length}`);
     if (allMarkets.length > 0) {
@@ -304,36 +308,31 @@ class ArbitrageService {
     this.crossScanCount++;
 
     try {
-      const allPfMarkets = await this.fetchAllMarkets();
-      const activePfMarkets = allPfMarkets.filter((m: any) =>
-        m.status === 'REGISTERED' || m.status === 'PRICE_PROPOSED' || m.status === 'UNPAUSED'
-      );
-
-      const [pmMarkets, pfMarkets] = await Promise.all([
-        this.pm.getActiveMarkets(),
-        Promise.resolve(activePfMarkets.map((m: any) => ({
-            platform: 'PREDICTFUN' as const,
-            id: m.id.toString(),
-            slug: m.slug || '',
-            title: m.title || '',
-            question: m.title || m.question || '',
-            outcomes: (m.outcomes || []).map((o: any) => o.name),
-            tokenIds: {
-              yes: (m.outcomes || [])[0]?.onChainId || '',
-              no: (m.outcomes || [])[1]?.onChainId || '',
-            },
-            isNegRisk: m.isNegRisk || false,
-            isYieldBearing: m.isYieldBearing || false,
-            feeRateBps: m.feeRateBps || 0,
-            tickSize: 0.01,
-            status: 'ACTIVE',
-            volume24h: parseFloat(m.volume24h || '0'),
-            liquidity: parseFloat(m.liquidity || '0'),
-            endDate: m.endTime ? new Date(m.endTime).getTime() : 0,
-            resolutionSource: 'UMA',
-          }))
-        ),
-      ]);
+      const pmMarkets = await this.pm.getActiveMarkets();
+      const pfMarkets: UnifiedMarket[] = [];
+      for (const [id, m] of this.activeMarkets) {
+        pfMarkets.push({
+          platform: 'PREDICTFUN' as const,
+          id: id.toString(),
+          slug: '',
+          title: m.title || '',
+          question: m.question || '',
+          outcomes: m.outcomes.map(o => o.name),
+          tokenIds: {
+            yes: m.outcomes[0]?.onChainId || '',
+            no: m.outcomes[1]?.onChainId || '',
+          },
+          isNegRisk: m.isNegRisk,
+          isYieldBearing: m.isYieldBearing,
+          feeRateBps: m.feeRateBps,
+          tickSize: 0.01,
+          status: 'ACTIVE',
+          volume24h: 0,
+          liquidity: 0,
+          endDate: 0,
+          resolutionSource: 'UMA',
+        });
+      }
 
       this.crossPmMarkets = pmMarkets;
       this.crossPfMarkets = pfMarkets;
