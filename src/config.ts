@@ -20,7 +20,12 @@ function envBool(key: string, defaultVal: boolean): boolean {
 export const AppConfig = {
   apiBaseUrl: process.env.PREDICT_API_URL || 'https://api.predict.fun',
   apiKey: process.env.PREDICT_API_KEY || '',
+
   walletPrivateKey: process.env.WALLET_PRIVATE_KEY || '',
+
+  privyWalletPrivateKey: process.env.PRIVY_WALLET_PRIVATE_KEY || '',
+
+  predictAccountAddress: process.env.PREDICT_ACCOUNT_ADDRESS || '',
 
   minProfitBps: envInt('MIN_PROFIT_BPS', 150),
   maxPositionPerMarket: envInt('MAX_POSITION_PER_MARKET', 10000),
@@ -52,3 +57,13 @@ export const AppConfig = {
   crossRebalanceThreshold: envFloat('CROSS_REBALANCE_THRESHOLD', 0.15),
   crossEventMatchThreshold: envFloat('CROSS_EVENT_MATCH_THRESHOLD', 0.5),
 };
+
+export function isUsingPredictAccount(): boolean {
+  return !!AppConfig.predictAccountAddress;
+}
+
+export function getSignerPrivateKey(): string {
+  return isUsingPredictAccount() && AppConfig.privyWalletPrivateKey
+    ? AppConfig.privyWalletPrivateKey
+    : AppConfig.walletPrivateKey;
+}

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { OrderBuilder, Side, ChainId } from '@predictdotfun/sdk';
 import { Wallet, parseEther } from 'ethers';
-import { AppConfig } from '../config';
+import { AppConfig, isUsingPredictAccount, getSignerPrivateKey } from '../config';
 import { JWTManager } from '../auth/jwtManager';
 import { ArbitrageOpportunity, ExecutionResult, OrderResult } from '../arb/types';
 import { OrderTracker } from '../tracker/orderTracker';
@@ -16,16 +16,28 @@ export class TradeExecutor {
   constructor(jwtManager: JWTManager, tracker: OrderTracker) {
     this.jwtManager = jwtManager;
     this.tracker = tracker;
-    this.signer = new Wallet(AppConfig.walletPrivateKey);
+    this.signer = new Wallet(getSignerPrivateKey());
     this.nonceCounter = BigInt(Math.floor(Date.now() / 1000));
   }
 
+  getOrderBuilder(): OrderBuilder | null {
+    return this.orderBuilder;
+  }
+
   async initialize(): Promise<void> {
+    const opts = isUsingPredictAccount()
+      ? { predictAccount: AppConfig.predictAccountAddress }
+      : undefined;
     this.orderBuilder = await OrderBuilder.make(
       ChainId.BnbMainnet,
       this.signer,
-      { predictAccount: this.signer.address }
+      opts
     );
+    this.jwtManager.setOrderBuilder(this.orderBuilder);
+  }
+
+  getMakerAddress(): string {
+    return isUsingPredictAccount() ? AppConfig.predictAccountAddress : this.signer.address;
   }
 
   async executeOpportunity(
@@ -146,9 +158,11 @@ export class TradeExecutor {
         quantityWei,
       });
 
+    const makerAddr = this.getMakerAddress();
+
     const order = this.orderBuilder.buildOrder('LIMIT', {
-      maker: this.signer.address,
-      signer: this.signer.address,
+      maker: makerAddr,
+      signer: makerAddr,
       side,
       tokenId,
       makerAmount,

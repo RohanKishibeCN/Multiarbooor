@@ -8,7 +8,7 @@ import { RiskEngine } from './arb/riskEngine';
 import { TradeExecutor } from './executor/tradeExecutor';
 import { OrderTracker } from './tracker/orderTracker';
 import { NotionReporter } from './reporter/notionReporter';
-import { AppConfig } from './config';
+import { AppConfig, isUsingPredictAccount, getSignerPrivateKey } from './config';
 import { MarketInfo, TradeRecord, DailyReport, OrderbookData } from './arb/types';
 
 import { PolymarketConnector } from './cross-arb/connectors/polymarket';
@@ -72,19 +72,20 @@ class ArbitrageService {
     console.log('========================================');
     console.log(`Wallet address: ${this.jwtManager.getWalletAddress()}`);
     console.log(`API URL: ${AppConfig.apiBaseUrl}`);
+    console.log(`  Mode:          ${isUsingPredictAccount() ? 'Predict Account' : 'EOA'}`);
     console.log(`  Internal arb:  ${AppConfig.enableInternalArb ? 'ENABLED' : 'DISABLED'}`);
     console.log(`  Cross-market:  ${AppConfig.enableCrossArb ? 'ENABLED' : 'DISABLED'}`);
 
-    const executor = this.executor as any;
-    if (executor.initialize) {
-      await executor.initialize();
-    }
+    await this.executor.initialize();
 
     if (AppConfig.enableCrossArb && this.crossCoordinator) {
+      const pfOpts = isUsingPredictAccount()
+        ? { predictAccount: AppConfig.predictAccountAddress }
+        : undefined;
       const pfOrderBuilder = await OrderBuilder.make(
         ChainId.BnbMainnet,
-        new Wallet(AppConfig.walletPrivateKey),
-        { predictAccount: new Wallet(AppConfig.walletPrivateKey).address }
+        new Wallet(getSignerPrivateKey()),
+        pfOpts
       );
       this.crossCoordinator.setPfOrderBuilder(pfOrderBuilder);
     }

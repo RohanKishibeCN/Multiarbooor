@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { Wallet } from 'ethers';
-import { AppConfig } from '../config';
+import type { OrderBuilder } from '@predictdotfun/sdk';
+import { AppConfig, isUsingPredictAccount, getSignerPrivateKey } from '../config';
 
 interface JWTState {
   token: string;
@@ -11,9 +12,10 @@ export class JWTManager {
   private state: JWTState | null = null;
   private wallet: Wallet;
   private http: AxiosInstance;
+  private orderBuilder: OrderBuilder | null = null;
 
   constructor() {
-    this.wallet = new Wallet(AppConfig.walletPrivateKey);
+    this.wallet = new Wallet(getSignerPrivateKey());
     this.http = axios.create({
       baseURL: AppConfig.apiBaseUrl,
       headers: { 'x-api-key': AppConfig.apiKey },
@@ -21,7 +23,15 @@ export class JWTManager {
     });
   }
 
+  setOrderBuilder(builder: OrderBuilder): void {
+    this.orderBuilder = builder;
+  }
+
   getWalletAddress(): string {
+    return isUsingPredictAccount() ? AppConfig.predictAccountAddress : this.wallet.address;
+  }
+
+  getPrivateKeyAddress(): string {
     return this.wallet.address;
   }
 
@@ -39,10 +49,26 @@ export class JWTManager {
     }
 
     const message = msgResp.data.message;
-    const signature = await this.wallet.signMessage(message);
+
+    let signature: string;
+    let signer: string;
+
+    if (isUsingPredictAccount()) {
+      if (!this.orderBuilder) {
+        throw new Error(
+          'Predict Account mode requires OrderBuilder. ' +
+          'Call jwtManager.setOrderBuilder() before getToken().'
+        );
+      }
+      signature = await this.orderBuilder.signPredictAccountMessage(message);
+      signer = AppConfig.predictAccountAddress;
+    } else {
+      signature = await this.wallet.signMessage(message);
+      signer = this.wallet.address;
+    }
 
     const { data: jwtResp } = await this.http.post('/v1/auth', {
-      signer: this.wallet.address,
+      signer,
       signature,
       message,
     });
@@ -57,5 +83,9 @@ export class JWTManager {
     };
 
     return this.state.token;
+  }
+
+  resetToken(): void {
+    this.state = null;
   }
 }

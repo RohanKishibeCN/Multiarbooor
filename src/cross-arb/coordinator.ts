@@ -2,7 +2,7 @@ import { CrossMarketOpportunity, CrossMarketExecutionResult, CrossTradeRecord } 
 import { PolymarketConnector } from './connectors/polymarket';
 import { JWTManager } from '../auth/jwtManager';
 import { OrderTracker } from '../tracker/orderTracker';
-import { AppConfig } from '../config';
+import { AppConfig, isUsingPredictAccount, getSignerPrivateKey } from '../config';
 
 import { Side, OrderBuilder, ChainId } from '@predictdotfun/sdk';
 import { Wallet, parseEther } from 'ethers';
@@ -22,11 +22,15 @@ export class AtomicCoordinator {
     this.pm = pm;
     this.jwtManager = jwtManager;
     this.tracker = tracker;
-    this.pfSigner = new Wallet(AppConfig.walletPrivateKey);
+    this.pfSigner = new Wallet(getSignerPrivateKey());
   }
 
   setPfOrderBuilder(builder: OrderBuilder): void {
     this.pfOrderBuilder = builder;
+  }
+
+  private getPfMakerAddress(): string {
+    return isUsingPredictAccount() ? AppConfig.predictAccountAddress : this.pfSigner.address;
   }
 
   async executeAtomicArbitrage(
@@ -231,9 +235,11 @@ export class AtomicCoordinator {
         quantityWei: parseEther(size.toString()),
       });
 
+    const pfMakerAddr = this.getPfMakerAddress();
+
     const order = this.pfOrderBuilder.buildOrder('LIMIT', {
-      maker: this.pfSigner.address,
-      signer: this.pfSigner.address,
+      maker: pfMakerAddr,
+      signer: pfMakerAddr,
       side: sideEnum,
       tokenId,
       makerAmount,
