@@ -137,15 +137,19 @@ class ArbitrageService {
   }
 
   private async loadActiveMarkets(): Promise<void> {
+    let responseData: any[] | null = null;
     try {
       const token = await this.jwtManager.getToken();
       const { data } = await axios.get(`${AppConfig.apiBaseUrl}/v1/markets`, {
         headers: { Authorization: `Bearer ${token}`, 'x-api-key': AppConfig.apiKey },
       });
 
+      responseData = data.data;
+
       if (data.success && data.data) {
+        console.log(`Market status example: ${data.data.slice(0, 5).map((m: any) => JSON.stringify({ id: m.id, status: m.status })).join(', ')}`);
         for (const market of data.data) {
-          if (market.status === 'REGISTERED' || market.status === 'PRICE_PROPOSED') {
+          if (market.status === 'REGISTERED' || market.status === 'PRICE_PROPOSED' || market.status === 'UNPAUSED') {
             this.activeMarkets.set(market.id, {
               id: market.id,
               title: market.title || market.question,
@@ -166,6 +170,8 @@ class ArbitrageService {
     } catch (error) {
       console.error('Failed to load active markets:', error);
     }
+
+    console.log(`Active markets loaded: ${this.activeMarkets.size}, total returned by API: ${responseData?.length || 0}`);
   }
 
   private async internalScan(): Promise<void> {
@@ -268,7 +274,7 @@ class ArbitrageService {
         this.pm.getActiveMarkets(),
         Promise.resolve(
           (pfResp.data || []).filter((m: any) =>
-            m.status === 'REGISTERED' || m.status === 'PRICE_PROPOSED'
+            m.status === 'REGISTERED' || m.status === 'PRICE_PROPOSED' || m.status === 'UNPAUSED'
           ).map((m: any) => ({
             platform: 'PREDICTFUN' as const,
             id: m.id.toString(),
